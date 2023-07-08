@@ -11,32 +11,41 @@ WindowWidth = "600"
 WindowHeight = "500"
 windowResolution = WindowWidth + "x" + WindowHeight
 
+fileFeuilleDeCompta = ""
 
-# def DonnerFeuilleDeCompta():
-#     FileC = filedialog.askopenfilename(initialdir="Desktop/", title="Feuille de compta")
-#     print(FileC)
-#     if ".xlsx" in FileC:
-#         if FileC != "":
-#             window.canva1.create_oval(360, 60, 390, 90, fill="green")
-#             # canva1.create_oval(
-#             #     releve_btn.winfo_x(),
-#             #     releve_btn.winfo_y(),
-#             #     releve_btn.winfo_x() + 40,
-#             #     releve_btn.winfo_y() + 40,
-#             #     fill="green",
-#             # )
-#             return FileC
-#         else:
-#             window.tk.create_oval(360, 60, 390, 90, fill="red")
-#             return ""
-#     else:
-#         window.AffichageMessage(
-#             "ERREUR: Extension fichier non reconnue. \n Je pense que tu es juste pas douée et que tu t'es juste trompé de fichier\n Sinon appelle Maxime il va regler le probleme"
-#         )
-#         window.tk.create_oval(360, 60, 390, 90, fill="red")
-#         return ""
 
-# Logique de la fonction DonnerFeuilleDeCompta
+def DonnerFeuilleDeCompta():
+    FileC = filedialog.askopenfilename(initialdir="Desktop/", title="Feuille de compta")
+    print(FileC)
+    if ".xlsx" in FileC:
+        if FileC != "":
+            afficher_cercle("DonnerFeuilleDeCompta", "true")
+            fileFeuilleDeCompta = FileC
+            return FileC
+    else:
+        # window.AffichageMessage(
+        #     "ERREUR: Extension fichier non reconnue. \n Je pense que tu es juste pas douée et que tu t'es juste trompé de fichier\n Sinon appelle Maxime il va regler le probleme"
+        # )
+        afficher_cercle("DonnerFeuilleDeCompta", "false")
+        return ""
+
+
+def afficher_cercle(nomFunction, valeur):
+    if nomFunction == "DonnerFeuilleDeCompta":
+        canvas.delete("all")  # Efface tout le contenu du canvas
+        x = int(WindowWidth) - 25
+        y = feuille_btn.winfo_y() + 18
+    elif nomFunction == "DonnerFeuilleDeCompta":
+        canvas.delete("all")  # Efface tout le contenu du canvas
+        x = int(WindowWidth) - 25
+        y = releve_btn.winfo_y() - 30
+
+    rayon = 20
+
+    if valeur == "false":
+        canvas.create_oval(x - rayon, y - rayon, x + rayon, y + rayon, fill="red")
+    elif valeur == "true":
+        canvas.create_oval(x - rayon, y - rayon, x + rayon, y + rayon, fill="green")
 
 
 print("Donner feuille de compta")
@@ -104,6 +113,10 @@ header_label = tk.Label(
     fg=text_color,
 )
 header_label.place(x=100, y=20)
+
+# Canvas pour afficher les cercles
+canvas = tk.Canvas(window, bg="#55868C", width=WindowWidth, height=WindowHeight)
+canvas.place(x=0, y=0)
 
 # Rectangle autour de l'entête
 header_rectangle = tk.Canvas(
