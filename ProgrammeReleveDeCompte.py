@@ -1,3 +1,11 @@
+## @ Author : mjacquot
+## @date : 09/07/2023
+## @ current version : 1.0
+## Last modif :
+## date :    author : modifs :
+
+
+
 import tkinter as tk
 from tkinter import font
 from tkinter import ttk
@@ -16,6 +24,10 @@ windowResolution = largeur_fenetre + "x" + hauteur_fenetre
 
 fileFeuilleDeCompta = ""
 fileReleveDeCompte = ""
+
+selected_month = ""
+selected_year = ""
+stratingLine = 0
 
 
 def donnerFile(nomBouton):
@@ -100,6 +112,42 @@ def afficher_error_message(parent, message):
 
     # Lancement de la boucle principale de la fenêtre
     error_fenetre.mainloop()
+    
+    
+########### ELEMENT PRINCIPAL DU PROGRAMME ##########
+########### ELEMENT PRINCIPAL DU PROGRAMME ##########
+########### ELEMENT PRINCIPAL DU PROGRAMME ##########
+########### ELEMENT PRINCIPAL DU PROGRAMME ##########
+
+
+def ExecProgramme():
+    # Logique de la fonction LancerProgramme
+    
+    selected_month = month_var.get()
+    selected_year = year_var.get()
+    
+    wbCompta = pyxl.load_workbook(fileFeuilleDeCompta)
+    wbReleve = pyxl.load_workbook(fileReleveDeCompte)
+    
+    for sheet in wbCompta:            ## recherche de la bonne feuille de la bonne année
+        if sheet.title == str(selected_year):           ##si le nom de la feuille corrsepond à l'année
+            wsAnnee = sheet                          ##stockage de la sheet
+    nombre = 1      ## pour stocker et creer la case de départ
+    colone = 'A'        ## pour faire les cases
+
+    while (nombre < 467) :                      ## recherche du mois dans le tbleur de compta
+            casedate = colone + str(nombre)
+            if wsAnnee[casedate].value == selected_month:
+                stratingLine = nombre + 3            ## + 3 car la case de juillet est 3 case au dessus de la premiere case à remplir
+            nombre = nombre + 1
+    
+    
+    
+    print("Lancer le programme")
+
+
+
+
 
 
 ## FONCTION EN RAPPORT AVEC L'INTERFACE GRAPHIQUE ##
@@ -124,9 +172,11 @@ def SoumettreMoisAnnee():
     print("Année sélectionnée :", selected_year)
 
 
-def LancerProgramme():
+def ExecProgramme():
     # Logique de la fonction LancerProgramme
     print("Lancer le programme")
+    
+    
 
 
 # Création de la fenêtre principale
@@ -280,7 +330,7 @@ selected_year_label.place(x=180, y=320 + y_spacing)
 launch_btn = tk.Button(
     window,
     text="Lancer le programme",
-    command=LancerProgramme,
+    command=ExecProgramme,
     font=button_font,
     bg=button_color,
     fg=text_color,
