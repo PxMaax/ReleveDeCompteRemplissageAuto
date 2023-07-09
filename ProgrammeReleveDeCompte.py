@@ -41,7 +41,7 @@ def donnerFile(nomBouton):
         afficher_cercle(nomBouton, "false")
         afficher_error_message(
             window,
-            "ERREUR: Extension fichier non reconnue. \n Tu t'es surement trompé de fichier. \n Si le problème persite, appelle Maxime",
+            "ERREUR: Extension fichier non reconnue. \n Tu t'es surement trompée de fichier. \n Si le problème persiste, appelle Maxime.",
         )
         return ""
 
