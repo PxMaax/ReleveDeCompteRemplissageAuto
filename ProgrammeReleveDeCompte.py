@@ -15,41 +15,49 @@ hauteur_fenetre = "500"
 windowResolution = largeur_fenetre + "x" + hauteur_fenetre
 
 fileFeuilleDeCompta = ""
+fileReleveDeCompte = ""
 
 
-def DonnerFeuilleDeCompta():
-    FileC = filedialog.askopenfilename(initialdir="Desktop/", title="Feuille de compta")
-    print(FileC)
-    if ".xlsx" in FileC:
-        if FileC != "":
-            afficher_cercle("DonnerFeuilleDeCompta", "true")
-            fileFeuilleDeCompta = FileC
-            return FileC
+def donnerFile(nomBouton):
+    File = filedialog.askopenfilename(initialdir="Desktop/", title="Feuille de compta")
+    print(File)
+    if ".xlsx" in File:
+        if File != "":
+                afficher_cercle(nomBouton, "true")
+                assign_file(nomBouton,File)
+                return File
     else:
+        afficher_cercle(nomBouton, "false")
         afficher_error_message(
             window,
-            "ERREUR: Extension fichier non reconnue. \n Je pense que tu es juste pas douée et que tu t'es juste trompé de fichier\n Sinon appelle Maxime il va regler le probleme",
+            "ERREUR: Extension fichier non reconnue. \n Tu t'es surement trompé de fichier. \n Si le problème persite, appelle Maxime",
         )
-        afficher_cercle("DonnerFeuilleDeCompta", "false")
         return ""
 
+def assign_file(nomBouton,file):
+    if nomBouton == "feuille_btn":
+        fileFeuilleDeCompta = file
+    elif nomBouton == "releve_btn":
+        fileReleveDeCompte = file
+    return "true"
+        
 
 def afficher_cercle(nomFunction, valeur):
-    if nomFunction == "DonnerFeuilleDeCompta":
-        canvas.delete("all")  # Efface tout le contenu du canvas
-        x = int(largeur_fenetre) - 25
-        y = feuille_btn.winfo_y() + 18
-    elif nomFunction == "DonnerFeuilleDeCompta":
-        canvas.delete("all")  # Efface tout le contenu du canvas
-        x = int(largeur_fenetre) - 25
-        y = releve_btn.winfo_y() - 30
+        ## ajout cercle premier bouton
+    if nomFunction == "feuille_btn": 
+        xcercle = int(largeur_fenetre) - 25
+        ycercle = feuille_btn.winfo_y() + 18
+        ## ajout cercle deuxieme bouton
+    elif nomFunction == "releve_btn":
+        xcercle = int(largeur_fenetre) - 25
+        ycercle = releve_btn.winfo_y() + 20
 
     rayon = 20
 
     if valeur == "false":
-        canvas.create_oval(x - rayon, y - rayon, x + rayon, y + rayon, fill="red")
+        canvas.create_oval(xcercle - rayon, ycercle - rayon, xcercle + rayon, ycercle + rayon, fill="red")
     elif valeur == "true":
-        canvas.create_oval(x - rayon, y - rayon, x + rayon, y + rayon, fill="green")
+        canvas.create_oval(xcercle - rayon, ycercle - rayon, xcercle + rayon, ycercle + rayon, fill="green")
 
 
 def afficher_error_message(parent, message):
@@ -106,10 +114,6 @@ bg_color = "#55868C"
 button_color = "#7F636E"
 text_color = "#000000"
 
-
-def DonnerReleveDeCompte():
-    # Logique de la fonction DonnerReleveDeCompte
-    print("Donner relevé de compte")
 
 
 def SoumettreMoisAnnee():
@@ -178,7 +182,7 @@ header_label.lift(aboveThis=header_rectangle)
 feuille_btn = tk.Button(
     window,
     text="Donner feuille de compta",
-    command=DonnerFeuilleDeCompta,
+    command=lambda :donnerFile("feuille_btn"),
     font=button_font,
     bg=button_color,
     fg=text_color,
@@ -189,7 +193,7 @@ feuille_btn.place(x=50 + x_spacing, y=80 + y_spacing, width=250)
 releve_btn = tk.Button(
     window,
     text="Donner relevé de compte",
-    command=DonnerReleveDeCompte,
+    command= lambda : donnerFile("releve_btn"),
     font=button_font,
     bg=button_color,
     fg=text_color,
