@@ -5,7 +5,6 @@
 ## date :    author : modifs :
 
 
-
 import tkinter as tk
 from tkinter import font
 from tkinter import ttk
@@ -35,9 +34,9 @@ def donnerFile(nomBouton):
     print(File)
     if ".xlsx" in File:
         if File != "":
-                afficher_cercle(nomBouton, "true")
-                assign_file(nomBouton,File)
-                return File
+            afficher_cercle(nomBouton, "true")
+            assign_file(nomBouton, File)
+            return File
     else:
         afficher_cercle(nomBouton, "false")
         afficher_error_message(
@@ -46,17 +45,18 @@ def donnerFile(nomBouton):
         )
         return ""
 
-def assign_file(nomBouton,file):
+
+def assign_file(nomBouton, file):
     if nomBouton == "feuille_btn":
         fileFeuilleDeCompta = file
     elif nomBouton == "releve_btn":
         fileReleveDeCompte = file
     return "true"
-        
+
 
 def afficher_cercle(nomFunction, valeur):
-        ## ajout cercle premier bouton
-    if nomFunction == "feuille_btn": 
+    ## ajout cercle premier bouton
+    if nomFunction == "feuille_btn":
         xcercle = int(largeur_fenetre) - 25
         ycercle = feuille_btn.winfo_y() + 18
         ## ajout cercle deuxieme bouton
@@ -67,9 +67,21 @@ def afficher_cercle(nomFunction, valeur):
     rayon = 20
 
     if valeur == "false":
-        canvas.create_oval(xcercle - rayon, ycercle - rayon, xcercle + rayon, ycercle + rayon, fill="red")
+        canvas.create_oval(
+            xcercle - rayon,
+            ycercle - rayon,
+            xcercle + rayon,
+            ycercle + rayon,
+            fill="red",
+        )
     elif valeur == "true":
-        canvas.create_oval(xcercle - rayon, ycercle - rayon, xcercle + rayon, ycercle + rayon, fill="green")
+        canvas.create_oval(
+            xcercle - rayon,
+            ycercle - rayon,
+            xcercle + rayon,
+            ycercle + rayon,
+            fill="green",
+        )
 
 
 def afficher_error_message(parent, message):
@@ -112,8 +124,8 @@ def afficher_error_message(parent, message):
 
     # Lancement de la boucle principale de la fenêtre
     error_fenetre.mainloop()
-    
-    
+
+
 ########### ELEMENT PRINCIPAL DU PROGRAMME ##########
 ########### ELEMENT PRINCIPAL DU PROGRAMME ##########
 ########### ELEMENT PRINCIPAL DU PROGRAMME ##########
@@ -122,32 +134,50 @@ def afficher_error_message(parent, message):
 
 def ExecProgramme():
     # Logique de la fonction LancerProgramme
-    
+
     selected_month = month_var.get()
     selected_year = year_var.get()
-    
+
     wbCompta = pyxl.load_workbook(fileFeuilleDeCompta)
     wbReleve = pyxl.load_workbook(fileReleveDeCompte)
-    
-    for sheet in wbCompta:            ## recherche de la bonne feuille de la bonne année
-        if sheet.title == str(selected_year):           ##si le nom de la feuille corrsepond à l'année
-            wsAnnee = sheet                          ##stockage de la sheet
-    nombre = 1      ## pour stocker et creer la case de départ
-    colone = 'A'        ## pour faire les cases
 
-    while (nombre < 467) :                      ## recherche du mois dans le tbleur de compta
-            casedate = colone + str(nombre)
-            if wsAnnee[casedate].value == selected_month:
-                stratingLine = nombre + 3            ## + 3 car la case de juillet est 3 case au dessus de la premiere case à remplir
-            nombre = nombre + 1
-    
-    
-    
+    for sheet in wbCompta:  ## recherche de la bonne feuille de la bonne année
+        if sheet.title == str(
+            selected_year
+        ):  ##si le nom de la feuille corrsepond à l'année
+            wsAnnee = sheet  ##stockage de la sheet
+    numeroCase = 1  ## pour stocker et creer la case de départ
+    colone = "A"  ## pour faire les cases
+
+    while numeroCase < 467:  ## recherche du mois dans le tbleur de compta
+        casedate = colone + str(numeroCase)
+        if wsAnnee[casedate].value == selected_month:
+            stratingLine = (
+                numeroCase + 3
+            )  ## + 3 car la case de juillet est 3 case au dessus de la premiere case à remplir
+        numeroCase = numeroCase + 1
+
+        dayPerMonth = 0
+
+    if (
+        month_var == "JANVIER"
+        or month_var == "MARS"
+        or month_var == "MAI"
+        or month_var == "JUILLET"
+        or month_var == "AOUT"
+        or month_var == "OCTOBRE"
+        or month_var == "DECEMBRE"
+    ):
+        dayPerMonth = 31
+    elif month_var == "FEVRIER":
+        if year_var % 4 == 0:
+            dayPerMonth = 29
+        else:
+            dayPerMonth = 28
+    else:
+        dayPerMonth = 30
+
     print("Lancer le programme")
-
-
-
-
 
 
 ## FONCTION EN RAPPORT AVEC L'INTERFACE GRAPHIQUE ##
@@ -163,7 +193,6 @@ button_color = "#7F636E"
 text_color = "#000000"
 
 
-
 def SoumettreMoisAnnee():
     # Logique de la fonction SoumettreMoisAnnee
     selected_month = month_var.get()
@@ -175,8 +204,6 @@ def SoumettreMoisAnnee():
 def ExecProgramme():
     # Logique de la fonction LancerProgramme
     print("Lancer le programme")
-    
-    
 
 
 # Création de la fenêtre principale
@@ -232,7 +259,7 @@ header_label.lift(aboveThis=header_rectangle)
 feuille_btn = tk.Button(
     window,
     text="Donner feuille de compta",
-    command=lambda :donnerFile("feuille_btn"),
+    command=lambda: donnerFile("feuille_btn"),
     font=button_font,
     bg=button_color,
     fg=text_color,
@@ -243,7 +270,7 @@ feuille_btn.place(x=50 + x_spacing, y=80 + y_spacing, width=250)
 releve_btn = tk.Button(
     window,
     text="Donner relevé de compte",
-    command= lambda : donnerFile("releve_btn"),
+    command=lambda: donnerFile("releve_btn"),
     font=button_font,
     bg=button_color,
     fg=text_color,
