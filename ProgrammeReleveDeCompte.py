@@ -7,9 +7,12 @@ import csv
 import os
 from tkinter import filedialog
 
-WindowWidth = "600"
-WindowHeight = "500"
-windowResolution = WindowWidth + "x" + WindowHeight
+
+## Déclaration de variable
+
+largeur_fenetre = "600"
+hauteur_fenetre = "500"
+windowResolution = largeur_fenetre + "x" + hauteur_fenetre
 
 fileFeuilleDeCompta = ""
 
@@ -23,9 +26,10 @@ def DonnerFeuilleDeCompta():
             fileFeuilleDeCompta = FileC
             return FileC
     else:
-        # window.AffichageMessage(
-        #     "ERREUR: Extension fichier non reconnue. \n Je pense que tu es juste pas douée et que tu t'es juste trompé de fichier\n Sinon appelle Maxime il va regler le probleme"
-        # )
+        afficher_error_message(
+            window,
+            "ERREUR: Extension fichier non reconnue. \n Je pense que tu es juste pas douée et que tu t'es juste trompé de fichier\n Sinon appelle Maxime il va regler le probleme",
+        )
         afficher_cercle("DonnerFeuilleDeCompta", "false")
         return ""
 
@@ -33,11 +37,11 @@ def DonnerFeuilleDeCompta():
 def afficher_cercle(nomFunction, valeur):
     if nomFunction == "DonnerFeuilleDeCompta":
         canvas.delete("all")  # Efface tout le contenu du canvas
-        x = int(WindowWidth) - 25
+        x = int(largeur_fenetre) - 25
         y = feuille_btn.winfo_y() + 18
     elif nomFunction == "DonnerFeuilleDeCompta":
         canvas.delete("all")  # Efface tout le contenu du canvas
-        x = int(WindowWidth) - 25
+        x = int(largeur_fenetre) - 25
         y = releve_btn.winfo_y() - 30
 
     rayon = 20
@@ -48,7 +52,46 @@ def afficher_cercle(nomFunction, valeur):
         canvas.create_oval(x - rayon, y - rayon, x + rayon, y + rayon, fill="green")
 
 
-print("Donner feuille de compta")
+def afficher_error_message(parent, message):
+    # Fonction pour gérer l'événement du clic sur le bouton "OK"
+    def fermer_fenetre():
+        error_fenetre.destroy()
+
+    # Création de la fenêtre
+    error_fenetre = tk.Toplevel(parent)
+    error_fenetre.title("Message d'erreur")
+    error_fenetre.iconbitmap("logo.ico")
+
+    # Création d'un label pour afficher le message
+    label_message = tk.Label(error_fenetre, text=message, font=label_font)
+    label_message.pack(padx=20, pady=20)
+
+    # Création d'un bouton "OK"
+    bouton_ok = tk.Button(
+        error_fenetre, text="OK", command=fermer_fenetre, width=10, height=2
+    )
+    bouton_ok.pack(pady=20)
+
+    # Calcul de la taille de la fenêtre en fonction de la longueur du message
+    largeur_error_fenetre = max(350, label_message.winfo_reqwidth() + 40)
+    hauteur_error_fenetre = 180
+
+    # Récupération de la taille de la fenêtre parente
+    parent.update_idletasks()  # Actualisation des tâches du parent
+    parent_width = parent.winfo_width()
+    parent_height = parent.winfo_height()
+
+    # Calcul de la position de la fenêtre pour la centrer
+    xerrorwindow = parent.winfo_rootx() + (parent_width - largeur_error_fenetre) // 2
+    yerrorwindow = parent.winfo_rooty() + (parent_height - hauteur_error_fenetre) // 2
+
+    # Configuration de la position et de la taille de la fenêtre
+    error_fenetre.geometry(
+        f"{largeur_error_fenetre}x{hauteur_error_fenetre}+{xerrorwindow}+{yerrorwindow}"
+    )
+
+    # Lancement de la boucle principale de la fenêtre
+    error_fenetre.mainloop()
 
 
 ## FONCTION EN RAPPORT AVEC L'INTERFACE GRAPHIQUE ##
@@ -88,7 +131,17 @@ window.title("Relevé de compte automatique")
 window.geometry(windowResolution)  # Taille fixe de la fenêtre
 window.configure(bg=bg_color)  # Couleur de fond de la fenêtre
 window.resizable(False, False)  # Désactiver le redimensionnement de la fenêtre
+window.iconbitmap("logo.ico")
 
+# Récupération de la taille de l'écran
+largeur_ecran = window.winfo_screenwidth()
+hauteur_ecran = window.winfo_screenheight()
+
+x = (largeur_ecran - int(largeur_fenetre)) // 2
+y = (hauteur_ecran - int(hauteur_fenetre)) // 2
+
+# Configuration de la position et de la taille de la fenêtre
+window.geometry(f"{int(largeur_fenetre)}x{int(hauteur_fenetre)}+{x}+{y}")
 
 # Police
 header_font = font.Font(family="Baskerville", size=20, weight="bold")
@@ -99,10 +152,6 @@ button_font = font.Font(family="Baskerville", size=14, weight="bold")
 y_spacing = 40  # Espacement vertical entre les éléments
 x_spacing = -10
 
-
-# window.canva1 = tk.Canvas(
-#     window, bg=bg_color, width=WindowWidth, height=WindowHeight
-# ).place(x=0, y=0)
 
 # Entête
 header_label = tk.Label(
@@ -115,7 +164,7 @@ header_label = tk.Label(
 header_label.place(x=100, y=20)
 
 # Canvas pour afficher les cercles
-canvas = tk.Canvas(window, bg="#55868C", width=WindowWidth, height=WindowHeight)
+canvas = tk.Canvas(window, bg="#55868C", width=largeur_fenetre, height=hauteur_fenetre)
 canvas.place(x=0, y=0)
 
 # Rectangle autour de l'entête
