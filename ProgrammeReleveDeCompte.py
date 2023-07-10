@@ -35,8 +35,13 @@ def donnerFile(nomBouton):
     if ".xlsx" in File:
         if File != "":
             afficher_cercle(nomBouton, "true")
-            assign_file(nomBouton, File)
-            return File
+            if nomBouton == "feuille_btn":
+                print("feuille de compta donnée")
+                fileFeuilleDeCompta = File
+            elif nomBouton == "releve_btn":
+                print("relevé de compte donné")
+                fileReleveDeCompte = File
+                       
     else:
         afficher_cercle(nomBouton, "false")
         afficher_error_message(
@@ -46,12 +51,14 @@ def donnerFile(nomBouton):
         return ""
 
 
-def assign_file(nomBouton, file):
-    if nomBouton == "feuille_btn":
-        fileFeuilleDeCompta = file
-    elif nomBouton == "releve_btn":
-        fileReleveDeCompte = file
-    return "true"
+# def assign_file(nomBouton, file):
+#     if nomBouton == "feuille_btn":
+#         print("feuille de compta donnée")
+#         fileFeuilleDeCompta = file
+#     elif nomBouton == "releve_btn":
+#         print("relevé de compte donné")
+#         fileReleveDeCompte = file
+#     return "true"
 
 
 def afficher_cercle(nomFunction, valeur):
@@ -134,12 +141,19 @@ def afficher_error_message(parent, message):
 
 def ExecProgramme():
     # Logique de la fonction LancerProgramme
-
+    print("lancement des chaussures")
     selected_month = month_var.get()
     selected_year = year_var.get()
-
+    print("fileFeuilleDeCompta" + fileFeuilleDeCompta)
     wbCompta = pyxl.load_workbook(fileFeuilleDeCompta)
-    wbReleve = pyxl.load_workbook(fileReleveDeCompte)
+    
+    ## excel compta
+    
+    ## trouver la case de départ
+    ## trouver la case de départ
+    ## trouver la case de départ
+    ## trouver la case de départ
+    
 
     for sheet in wbCompta:  ## recherche de la bonne feuille de la bonne année
         if sheet.title == str(
@@ -147,18 +161,22 @@ def ExecProgramme():
         ):  ##si le nom de la feuille corrsepond à l'année
             wsAnnee = sheet  ##stockage de la sheet
     numeroCase = 1  ## pour stocker et creer la case de départ
-    colone = "A"  ## pour faire les cases
-
-    while numeroCase < 467:  ## recherche du mois dans le tbleur de compta
+    
+    flag = 'false'
+    while numeroCase < 467 & flag == 'false':  ## recherche du mois dans le tbleur de compta
+        colone = "A"  ## pour faire les cases
         casedate = colone + str(numeroCase)
         if wsAnnee[casedate].value == selected_month:
-            stratingLine = (
-                numeroCase + 3
-            )  ## + 3 car la case de juillet est 3 case au dessus de la premiere case à remplir
-        numeroCase = numeroCase + 1
+            casePremierJour = "U" + str(numeroCase + 3)  ## + 3 car la case de juillet est 3 case au dessus de la premiere case à remplir
+            flag = 'true'
 
-        dayPerMonth = 0
-
+    ## trouver nombre de jour dans le mois  
+    ## trouver nombre de jour dans le mois  
+    ## trouver nombre de jour dans le mois  
+    ## trouver nombre de jour dans le mois  
+    ## trouver nombre de jour dans le mois  
+    
+    dayInMonth = 0
     if (
         month_var == "JANVIER"
         or month_var == "MARS"
@@ -168,16 +186,29 @@ def ExecProgramme():
         or month_var == "OCTOBRE"
         or month_var == "DECEMBRE"
     ):
-        dayPerMonth = 31
+        dayInMonth = 31
     elif month_var == "FEVRIER":
         if year_var % 4 == 0:
-            dayPerMonth = 29
+            dayInMonth = 29
         else:
-            dayPerMonth = 28
+            dayInMonth = 28
     else:
-        dayPerMonth = 30
+        dayInMonth = 30
 
-    print("Lancer le programme")
+    ##excel relevé de compte: 
+    
+    wbReleve = pyxl.load_workbook(fileReleveDeCompte)
+    wsReleve = wbReleve.active
+    caseDeDepart = "B11"
+    ligneLimite = 10
+    caseIteration = "A" + ligneLimite
+    while wsReleve["A"+ligneLimite].value == "" :
+        ligneLimite = ligneLimite+1
+
+    print("ligneLimite = " + ligneLimite )
+    
+    
+    print("Attrapés les chaussures")
 
 
 ## FONCTION EN RAPPORT AVEC L'INTERFACE GRAPHIQUE ##
@@ -200,10 +231,6 @@ def SoumettreMoisAnnee():
     print("Mois sélectionné :", selected_month)
     print("Année sélectionnée :", selected_year)
 
-
-def ExecProgramme():
-    # Logique de la fonction LancerProgramme
-    print("Lancer le programme")
 
 
 # Création de la fenêtre principale
