@@ -236,7 +236,7 @@ def SoumettreMoisAnnee():
 # Création de la fenêtre principale
 window = tk.Tk()
 window.title("Relevé de compte automatique")
-window.geometry(windowResolution)  # Taille fixe de la fenêtre
+##window.geometry(windowResolution)  # Taille fixe de la fenêtre
 window.configure(bg=bg_color)  # Couleur de fond de la fenêtre
 window.resizable(False, False)  # Désactiver le redimensionnement de la fenêtre
 window.iconbitmap("logo.ico")
