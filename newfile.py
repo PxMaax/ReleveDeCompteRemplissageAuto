@@ -44,6 +44,8 @@ class ReleveAuto:
     ligne_depart_releve = 11
     colone_depart_releve = "B"
     case_depart_releve = "B11"
+    
+    
 
     def AffilierTableur(
         self, file
@@ -52,8 +54,10 @@ class ReleveAuto:
 
 
     ## lire la case, analyser son contenu, mettre les bonnes valeurs au bon endroit, ou reporter valeur dans un excel
-    def lecture_ligne_releve(self, lignecourrante, worksheet):
-        return
+    def lecture_ligne_releve(self, value_case_releve):
+        if value_case_releve.contains("REMISE CARTE"):
+            if value_case_releve.contains()
+            
 
     def AffilierDoss(
         self, file
@@ -90,7 +94,7 @@ class ReleveAuto:
                     ligne + 3,
                 )
                 flag = False
-                colone = "U"
+                colone = "V"
             ligne = ligne + 1
 
         if (
@@ -118,9 +122,12 @@ class ReleveAuto:
         releve_de_compte_ws = releve_de_compte_wb.active
         
         case_iteration = self.case_depart_releve
-        
+        ligne_releve = 11 
         while (releve_de_compte_ws[case_iteration].value is not None ):
-            self.lecture_ligne_releve()
+            
+            self.lecture_ligne_releve(ligne_releve,releve_de_compte_ws[case_iteration].value)
+            ligne_releve = ligne_releve + 1
+            case_iteration = "B" + str(ligne_releve)
 
         
         
