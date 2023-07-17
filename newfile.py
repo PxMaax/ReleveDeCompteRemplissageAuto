@@ -6,6 +6,7 @@ from tkinter import font
 import csv
 import os
 from tkinter import filedialog
+import re
 
 bg_color = "#55868C"
 button_color = "#7F636E"
@@ -45,19 +46,42 @@ class ReleveAuto:
     colone_depart_releve = "B"
     case_depart_releve = "B11"
     
+    tableau_de_compta_wb = None
+    releve_de_compte_wb  = None
+    
+    tableau_de_compta_ws = None
+    releve_de_compte_ws = None
+    
     
 
     def AffilierTableur(
         self, file
     ):  ## deff d'affiliation de correctionfile Appellée apres pression sur le bouton
         self.tablfile = file
+        
+    def extract_match_date_from_string(text):
+        # Utiliser une expression régulière pour rechercher la date au format "DD/MM"
+        date_pattern = r'\b\d{2}/\d{2}\b'
+        match = re.search(date_pattern, text)
+        if match:
+            return match        
+        return "no match"    
 
 
     ## lire la case, analyser son contenu, mettre les bonnes valeurs au bon endroit, ou reporter valeur dans un excel
     def lecture_ligne_releve(self, value_case_releve):
         if value_case_releve.contains("REMISE CARTE"):
-            if value_case_releve.contains()
-            
+            # avec contact
+            if value_case_releve.contains("069746201"):
+                match_group = self.extract_match_date_from_string(value_case_releve)
+                if match_group != "no match":
+                    jour = match_group.group(1)
+                    mois = match_group.group(2)
+
+                ## sans contact
+            elif value_case_releve.contains("223293501"):
+                ## DAB
+            elif value_case_releve.contains("290307501"):
 
     def AffilierDoss(
         self, file
@@ -71,14 +95,14 @@ class ReleveAuto:
     def Execution(
         self
     ):
-        tableau_de_compta_wb = pyxl.load_workbook(self.fileFeuilleDeCompta)
-        releve_de_compte_wb  = pyxl.load_workbook(self.fileReleveDeCompte)
+        self.tableau_de_compta_wb = pyxl.load_workbook(self.fileFeuilleDeCompta)
+        self.releve_de_compte_wb  = pyxl.load_workbook(self.fileReleveDeCompte)
 
-        for sheet in tableau_de_compta_wb:  ## recherche de la bonne feuille de la bonne année
+        for sheet in self.tableau_de_compta_wb:  ## recherche de la bonne feuille de la bonne année
             if sheet.title == str(
                 self.annee
             ):  ##si le nom de la feuille corrsepond à l'année
-                tableau_de_compta_ws = sheet  ##stockage de la sheet
+                self.tableau_de_compta_ws = sheet  ##stockage de la sheet
         
         ## pour stocker et creer la case de départ
         ligne = 1  
@@ -89,7 +113,7 @@ class ReleveAuto:
         ## recherche du mois dans le tbleur de compta
         while ligne < 467 & flag == True:  
             casedate = colone + str(ligne)
-            if tableau_de_compta_ws[casedate].value == self.mois:
+            if self.tableau_de_compta_ws[casedate].value == self.mois:
                 self.lignedebut = (
                     ligne + 3,
                 )
@@ -119,20 +143,20 @@ class ReleveAuto:
         
         ##case de départ du relevé de compte
         
-        releve_de_compte_ws = releve_de_compte_wb.active
+        self.releve_de_compte_ws = self.releve_de_compte_wb.active
         
         case_iteration = self.case_depart_releve
         ligne_releve = 11 
-        while (releve_de_compte_ws[case_iteration].value is not None ):
+        while (self.releve_de_compte_ws[case_iteration].value is not None ):
             
-            self.lecture_ligne_releve(ligne_releve,releve_de_compte_ws[case_iteration].value)
+            self.lecture_ligne_releve(ligne_releve,self.releve_de_compte_ws[case_iteration].value)
             ligne_releve = ligne_releve + 1
             case_iteration = "B" + str(ligne_releve)
 
         
         
         print("chaussure :) ")  ## j'ai retrouvé mes chaussures!!
-        tableau_de_compta_wb.save(self.fileFeuilleDeCompta)  ##save de la feuille de compta
+        self.tableau_de_compta_wb.save(self.fileFeuilleDeCompta)  ##save de la feuille de compta
 
 
 class Application(tk.Tk):
