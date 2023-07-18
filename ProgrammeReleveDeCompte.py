@@ -119,18 +119,13 @@ class ReleveAuto:
                     
                     
         if len(tab_result = 0):
-            ligneerreur = (current_cell,'aucune autre carte de cette date n a été trouvée')
-            self.sheet_des_problemes.append(ligneerreur)
-            
-        elif len(tab_result > 1):
-            ligneerreur = (current_cell,'Plusieurs cartes de cette date ont été trouvée')
-            self.sheet_des_problemes.append(ligneerreur)
-        else :
-            return tab_result
-            ## write in E colomn
-        
-        return None
+            tab_result = {"erreur": (current_cell, 'aucune autre carte de cette date n a été trouvée')}
 
+        elif len(tab_result > 1):
+            tab_result = {"erreur": (current_cell,'Plusieurs cartes de cette date ont été trouvée')}
+        
+        return tab_result
+            ## write in E colomn
 
     ## lire la case, analyser son contenu, mettre les bonnes valeurs au bon endroit, ou reporter valeur dans un excel
     def lecture_ligne_releve(self, value_case_releve):
@@ -142,8 +137,11 @@ class ReleveAuto:
                 if complete_date != "no match":
                     jour = complete_date.group(1)
                     mois = complete_date.group(2)
-                    case_carte_meme_jour = self.trouver_case_carte_meme_date(self, value_case_releve,"223293501",complete_date)
-                    list(case_carte_meme_jour.values())[0]
+                    result_chercher_case_carte = self.trouver_case_carte_meme_date( self,value_case_releve,"223293501",complete_date)
+                    if(result_chercher_case_carte.key()=="erreur"):
+                        caes=0 ##écrire message dans tableau excel
+                    else : 
+                        acse = 0    
                     ##cocher 
 
                 ## sans contact
