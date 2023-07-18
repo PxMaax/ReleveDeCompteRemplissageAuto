@@ -67,6 +67,50 @@ class ReleveAuto:
             return match        
         return "no match"    
 
+    
+def find_value_and_date(self, current_cell, target_value, target_date):
+    # Coordonnées de la case actuelle
+    current_row= current_cell.row
+    tab_result = {}
+
+    # print( "current row")
+    # print(current_row)
+    # print("target value")
+    # print(target_value)
+    # # Parcourir les 10 cases au-dessus et en dessous de la case actuelle
+    for row_offset in range(-15, 16):
+            # Ignorer la case actuelle
+            if row_offset == 0:
+                continue
+
+            # Coordonnées de la case à vérifier
+            row_to_check = current_row + row_offset
+            #print('row to check ')
+            #print(row_to_check)
+            # Récupérer la valeur et la date dans la case à vérifier
+            cell_value = self.releve_de_compte_ws.cell(row=row_to_check, column=2).value
+            #print('cell value')
+            #print(cell_value)
+            # Vérifier si la valeur et la date correspondent aux cibles
+            if (target_value in cell_value) & (target_date in cell_value):
+                cell_date = self.releve_de_compte_ws.cell(row=row_to_check, column=2).value
+                #print("cell date")
+                #print(cell_date)
+                tab_result["B" + row_to_check] = cell_date
+                
+                ## générer les erreurs avec leurs bonnes valeurs dans un fichiers excel
+                # idea : case, type erreur
+                
+    if len(tab_result = 0):
+        
+        print('erreur pour la case :' + current_cell)
+        print('aucune autre carte de cette date n a été trouvée')z
+    if len(tab_result > 1):
+        print('erreur pour la case :' + current_cell)
+        print('plusieurs autres cartes ont été trouvées pour cette date')
+
+    return None
+
 
     ## lire la case, analyser son contenu, mettre les bonnes valeurs au bon endroit, ou reporter valeur dans un excel
     def lecture_ligne_releve(self, value_case_releve):
