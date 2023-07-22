@@ -9,6 +9,8 @@ from tkinter import filedialog
 import re
 from datetime import date
 from erreur_class import ErreurExcel
+from datetime import datetime
+
 
 bg_color = "#55868C"
 button_color = "#7F636E"
@@ -39,18 +41,17 @@ x_spacing = -10 # Espacement horizontal entre les élements
 class ReleveAuto:
     
     mois = ""
-    annee = 0
+    annee = ""
     lignedebut = 0
     version = "Version 1"
     nbJours = 0
-    
-    ligne_depart_releve_de_compte = 0
-    
+    jour = 0
+        
     fileFeuilleDeCompta = ""
     fileReleveDeCompte = ""
     
-    ligne_depart_releve = 11
     colone_depart_releve = "B"
+    ligne_releve = 11
     
     tableau_de_compta_wb = None
     releve_de_compte_wb  = None
@@ -66,6 +67,7 @@ class ReleveAuto:
     tableau_erreur = []
     
     case_iteration = ""
+    numMois = 0
     
     
     def fill_fichier_error (self):
@@ -77,7 +79,7 @@ class ReleveAuto:
         self.releve_de_compte_ws["E" + ligne] = "X"
         return 
     
-    def verif_CB(self,valeur_SC,valeur_AvC ):
+    def verif_CB(self,valeur_SC,valeur_AvC,day_value ):
         
         """
             verif_CB : Check les valeurs trouvées dans le relevé de compte match avec les fiches de caisse
@@ -85,22 +87,26 @@ class ReleveAuto:
             :param valeur_SC : valeur carte Sans contact
             :param valeur_AvC : valeur carte Avc Contact
             :return : Vrai si match
-        """ 
-        if (self.tableau_de_compta_ws["D"+self.lignedebut] != (valeur_SC + valeur_AvC) ):
-            raise ErreurExcel(self.case_iteration, "la date n'a pas été trouvée")
+         """ 
+        print("valeur sc" +  str(valeur_SC))
+        print("valeur AvC" +  str(valeur_AvC))
+        print("jour : " + str(day_value))
+        print("valeur dans le tableau de compte à la case : " + "D"+str(self.lignedebut+day_value) + " = " + str(self.tableau_de_compta_ws["D"+str(self.lignedebut+day_value-1)].value))
+        print("la valeur entre les deux cartes bleues" + str((valeur_SC + valeur_AvC)))
         
+        if (str(self.tableau_de_compta_ws["D"+str(self.lignedebut+day_value-1)].value) != str((valeur_SC + valeur_AvC)) ):
+            raise ErreurExcel(self.case_iteration, "La veleur dans le relevé et dans l'excel de compta ne correspondent pas")
         return True
     
     def getValeurCredit (self, current_cell):
         
         """
             getValeurCredit : Function trouve la valeur de crédit
-
             :param current_cell : case de la valeur qu'on cherche
             :return: Credit lié à la case en cours
         """ 
-    
-        return self.releve_de_compte_ws["D" + current_cell.row ].value
+        current_cell.row
+        return self.releve_de_compte_ws["D" +str(current_cell.row)].value
         
     def extract_match_date_from_string(self,value_case_releve):
         # Utiliser une expression régulière pour rechercher la date au format "DD/MM"
@@ -126,13 +132,16 @@ class ReleveAuto:
         
         # Coordonnées de la case actuelle
         flag = False
+        # print("target date : " + target_date )
+        # print("ligne_current_cell" + str(ligne_current_cell))
         # print( "current row")
         # print(current_row)
         # print("target value")
         # print(target_value)
+        
         # # Parcourir les 15 cases au-dessus et en dessous de la case actuelle
         for row_offset in range(-15, 16):
-
+                # print("row offset :" + str(row_offset))
                 # Coordonnées de la case à vérifier
                 row_to_check = ligne_current_cell + row_offset
                 # print('row to check ')
@@ -140,19 +149,19 @@ class ReleveAuto:
                 # Récupérer la valeur et la date dans la case à vérifier
                 if row_to_check >0:
                     cell_value = self.releve_de_compte_ws.cell(row=row_to_check, column=2).value
-                    if (cell_value is not None and cell_value != "" ):
-                        print("cell value : " + cell_value)
-                    # Vérifier si la valeur et la date correspondent aux cibles
-                    if (cell_value is not None and cell_value != "" ) and ("223293501" in cell_value) and (target_date in cell_value):
+                    # print("case : B" + str(row_to_check)  )
+                
+                    if (cell_value is not None ) and ("0697462" in cell_value) and (target_date in cell_value):
                         cell_date = self.releve_de_compte_ws.cell(row=row_to_check, column=2)
-                        print("cell date")
-                        print(cell_date.value)
+                        # print("cell date")
+                        # print(cell_date.value)
                         if flag is True :
                             raise ErreurExcel(self.case_iteration,"Plusieurs cartes trouvées pour la date : " + target_date)
                         else: flag = True
-                        
-                    if flag is False:
-                        raise ErreurExcel(self.case_iteration,"Aucune carte sans contact n'a été trouvée à cette date : " + target_date)
+                            
+                    
+        if flag is False:
+            raise ErreurExcel(self.case_iteration,"Aucune carte avec contact n'a été trouvée à cette date : " + target_date)
             
         return cell_date
 
@@ -162,10 +171,10 @@ class ReleveAuto:
             value_case_releve = case_releve.value
             ##Si la case est une carte bleue
             if ("REMISE CARTE") in value_case_releve:
-                print("find remise carte in line : "+ str(ligne_releve))
-                ## Si la carte est une AvC
-                if ("0697462") in value_case_releve:
-                        print("find card Avc : "+ str(ligne_releve))
+                # print("find remise carte in line : "+ str(ligne_releve))
+                ## Si la carte est une AvC223293501
+                if ("2232935") in value_case_releve:
+                       ## print("find card Avc : "+ str(ligne_releve))
                     ## Rechercher la CB SC de la ^m journée
                     ## Ajouter les deux cartes bleues ensemble
                     ## check avec le tableur compta s'il y a match 
@@ -175,12 +184,17 @@ class ReleveAuto:
                     
                         complete_date = self.extract_match_date_from_string(value_case_releve)
 
-                        if complete_date != "no match":
+                        if complete_date:
+                            # Conversion de la chaîne de date en objet de date Python
+                            date_object = datetime.strptime(complete_date, '%d/%m')
+                            # Obtenir le jour en tant qu'entier
+                            day_value = date_object.day
+                            month_value = str(date_object.month)
+                            # print('est ce que la valeur month :'+  month_value + 'est egale à ' + self.numMois)
+                        if complete_date != "no match" and month_value == self.numMois:
                             case_carte_sc = self.trouver_case_carte_meme_date(ligne_releve,complete_date)                         
-                            if self.verif_CB(self.getValeurCredit(case_carte_sc),self.getValeurCredit(self.case_iteration)) == True :
+                            if self.verif_CB(self.getValeurCredit(case_carte_sc),self.getValeurCredit(self.releve_de_compte_ws[self.case_iteration]),day_value) == True :
                                 self.cocher_releve_de_compte(str(ligne_releve+ self.lignedebut ))
-                            else : raise   
-                            ErreurExcel(self.case_iteration,"Les valeurs de carte bleue ne correspondent pas pour cette date : " + complete_date )
                 ## DABoi
             elif ("2903075") in value_case_releve:
                 self.tableau_de_compta_ws["AI" + str(ligne_releve)].value = -(self.getValeurCredit(self.case_iteration).value)
@@ -189,15 +203,6 @@ class ReleveAuto:
                 self.tableau_erreur.append((e.current_cellCoord, e.details_error))        
                 
                 return
-            
-    def AffilierDoss(
-        self, file
-    ):  ## def d'affiliation de paquetfile Apellée apres pression dur le bouton
-        self.paquetfile = file
-
-    def AffilierMA(self, mois, annee):  ## same pour nbquestion
-        self.mois = mois
-        self.annee = int(annee)
 
     def Execution(
         self
@@ -208,9 +213,8 @@ class ReleveAuto:
             self.releve_de_compte_wb  = pyxl.load_workbook(self.fileReleveDeCompte)
 
             for sheet in self.tableau_de_compta_wb:  ## recherche de la bonne feuille de la bonne année
-                if sheet.title == str(
-                    self.annee
-                ):  ##si le nom de la feuille corrsepond à l'année
+                if sheet.title == str(self.annee):  ##si le nom de la feuille corrsepond à l'année
+                    # print("le tableau de compta a été trouvé")
                     self.tableau_de_compta_ws = sheet  ##stockage de la sheet
             
             ## pour stocker et creer la case de départ
@@ -220,49 +224,55 @@ class ReleveAuto:
             flag = True
             
             ## recherche du mois dans le tbleur de compta
-            while ligne < 467 & flag == True:  
+            while ligne < 467 and flag == True:  
                 casedate = colone + str(ligne)
+                # print("self.tableau_de_compta_ws[casedate].value" + self.tableau_de_compta_ws[casedate].value)
                 if self.tableau_de_compta_ws[casedate].value == self.mois:
+                    # print("le mois a été trouvé")
                     self.lignedebut = (
-                        ligne + 3,
+                        ligne + 3
                     )
                     flag = False
                     colone = "V"
                 ligne = ligne + 1
                 
-                
-            if (
-                self.mois == "JANVIER"
-                or self.mois == "MARS"
-                or self.mois == "MAI"
-                or self.mois == "JUILLET"
-                or self.mois == "AOUT"
-                or self.mois == "OCTOBRE"
-                or self.mois == "DECEMBRE"
-            ):
-                self.nbjours = 31
-            elif self.mois == "FEVRIER":
-                if self.annee % 4 == 0:
-                    self.nbjours = 29
-                else:
-                    self.nbjours = 28
-            else:
-                self.nbjours = 30 
+                if self.mois == "JANVIER":
+                    self.numMois= "1"
+                elif self.mois == "FEVRIER":
+                    self.numMois= "2"
+                elif self.mois == "MARS":
+                    self.numMois= "3"
+                elif self.mois == "AVRIL":
+                    self.numMois= "4"
+                elif self.mois == "MAI":
+                    self.numMois= "5"
+                elif self.mois == "JUIN":
+                    self.numMois= "6"
+                elif self.mois == "JUILLET":
+                    self.numMois= "7"
+                elif self.mois == "AOUT":
+                    self.numMois= "8"
+                elif self.mois == "SEPTEMBRE":
+                    self.numMois= "9"
+                elif self.mois == "OCTOBRE":
+                    self.numMois= "10"
+                elif self.mois == "NOVEMBRE":
+                    self.numMois= "11"
+                elif self.mois == "DECEMBRE":
+                    self.numMois= "12"
 
             ## lire la colone de relevé de compte
             ##case de départ du relevé de compte
 
             
             self.releve_de_compte_ws = self.releve_de_compte_wb.active
-            ligne_releve = 11 
-            i = 0
-            self.case_iteration =  str(self.colone_depart_releve) + str(self.ligne_depart_releve)
+            
+            self.case_iteration =  str(self.colone_depart_releve) + str(self.ligne_releve)
             while (self.releve_de_compte_ws[self.case_iteration].value is not None ):
-                print(i)
-                self.lecture_ligne_releve(ligne_releve,self.releve_de_compte_ws[self.case_iteration])
-                ligne_releve = ligne_releve + 1
-                self.case_iteration = "B" + str(ligne_releve)
-                i = i+1
+                
+                self.lecture_ligne_releve(self.ligne_releve,self.releve_de_compte_ws[self.case_iteration])
+                self.ligne_releve = self.ligne_releve + 1
+                self.case_iteration = "B" + str(self.ligne_releve)
             
             print("chaussure :) ")  ## j'ai retrouvé mes chaussures!!
             
@@ -275,7 +285,7 @@ class ReleveAuto:
             self.fill_fichier_error()
             self.tableau_de_compta_wb.save(self.fileFeuilleDeCompta)  ##save de la feuille de compta
             self.excel_des_problemes.save(fichier_enregistrement)
-            
+            self.releve_de_compte_wb.seve(self.fileReleveDeCompte)
         except ErreurExcel as e:  
                 self.tableau_erreur.append((e.current_cellCoord, e.details_error))      
             
@@ -357,18 +367,18 @@ class Application(tk.Tk):
             canvas,
             self.month_var,
             "Mois",  # Ajoutez "Mois" comme première option dans la liste
-            "Janvier",
-            "Février",
-            "Mars",
-            "Avril",
-            "Mai",
-            "Juin",
-            "Juillet",
-            "Août",
-            "Septembre",
-            "Octobre",
-            "Novembre",
-            "Décembre",
+            "JANVIER",
+            "FEVRIER",
+            "MARS",
+            "AVRIL",
+            "MAI",
+            "JUIN",
+            "JUILLET",
+            "AOUT",
+            "SEPTEMBRE",
+            "OCTOBRE",
+            "NOVEMBRE",
+            "DECEMBRE",
         )
 
         month_dropdown.config(
@@ -485,7 +495,7 @@ class Application(tk.Tk):
     ## correspond à la commande effectuée lors du push des 2 premiers boutons
     def donnerFile(self,Cnvas,nomBouton):
         File = filedialog.askopenfilename(initialdir="Desktop/", title="Feuille de compta")
-        print(File)
+        # print(File)
         
         if nomBouton == "feuille_btn":
             xcercle = int(largeur_fenetre) - 25
@@ -556,8 +566,8 @@ class Application(tk.Tk):
         else:        
             
             try: 
-                self.ReleveAuto.mois = self.month_var.get()
-                self.ReleveAuto.annee = self.year_var.get()
+                # print("mois :" + self.ReleveAuto.mois)
+                # print("année :" + self.ReleveAuto.annee)
                 self.ReleveAuto.Execution()
                 self.afficher_message("Compta effectuée")
                             
