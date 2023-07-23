@@ -79,7 +79,7 @@ class ReleveAuto:
         self.releve_de_compte_ws["E" + ligne] = "X"
         return 
     
-    def verif_CB(self,valeur_SC,valeur_AvC,day_value ):
+    def verif_CB(self,valeur_SC,valeur_AvC,day_value):
         
         """
             verif_CB : Check les valeurs trouvées dans le relevé de compte match avec les fiches de caisse
@@ -91,7 +91,7 @@ class ReleveAuto:
         print("valeur sc" +  str(valeur_SC))
         print("valeur AvC" +  str(valeur_AvC))
         print("jour : " + str(day_value))
-        print("valeur dans le tableau de compte à la case : " + "D"+str(self.lignedebut+day_value) + " = " + str(self.tableau_de_compta_ws["D"+str(self.lignedebut+day_value-1)].value))
+        print("valeur dans le tableau de compte à la case : " + "D"+str(self.lignedebut+day_value-1) + " = " + str(self.tableau_de_compta_ws["D"+str(self.lignedebut+day_value-1)].value))
         print("la valeur entre les deux cartes bleues" + str((valeur_SC + valeur_AvC)))
         
         if (str(self.tableau_de_compta_ws["D"+str(self.lignedebut+day_value-1)].value) != str((valeur_SC + valeur_AvC)) ):
@@ -161,8 +161,11 @@ class ReleveAuto:
                             
                     
         if flag is False:
-            raise ErreurExcel(self.case_iteration,"Aucune carte avec contact n'a été trouvée à cette date : " + target_date)
-            
+            date_object = datetime.strptime(target_date, '%d/%m')
+            day_value = date_object.day
+            if self.verif_CB(0,self.getValeurCredit(self.releve_de_compte_ws[self.case_iteration]),day_value) == False :
+                raise ErreurExcel(self.case_iteration,"Aucune carte avec contact n'a été trouvée à cette date : " + target_date)
+            else: return self.releve_de_compte_ws["AAAA10000"]
         return cell_date
 
     ## lire la case, analyser son contenu, mettre les bonnes valeurs au bon endroit, ou reporter valeur dans un excel
@@ -285,7 +288,7 @@ class ReleveAuto:
             self.fill_fichier_error()
             self.tableau_de_compta_wb.save(self.fileFeuilleDeCompta)  ##save de la feuille de compta
             self.excel_des_problemes.save(fichier_enregistrement)
-            self.releve_de_compte_wb.seve(self.fileReleveDeCompte)
+            self.releve_de_compte_wb.save(self.fileReleveDeCompte)
         except ErreurExcel as e:  
                 self.tableau_erreur.append((e.current_cellCoord, e.details_error))      
             
