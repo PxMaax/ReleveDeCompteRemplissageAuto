@@ -75,8 +75,8 @@ class ReleveAuto:
             self.sheet_des_problemes.cell(row=index, column=1, value=valeur_1)
             self.sheet_des_problemes.cell(row=index, column=2, value=valeur_2)
         
-    def cocher_releve_de_compte(self,ligne):
-        self.releve_de_compte_ws["E" + ligne] = "X"
+    def noter_releve_de_compte(self,ligne,message):
+        self.releve_de_compte_ws["E" + ligne] = message
         return 
     
     def verif_CB(self,valeur_SC,valeur_AvC,day_value):
@@ -92,10 +92,10 @@ class ReleveAuto:
         print("valeur AvC" +  str(valeur_AvC))
         print("jour : " + str(day_value))
         print("valeur dans le tableau de compte à la case : " + "D"+str(self.lignedebut+day_value-1) + " = " + str(self.tableau_de_compta_ws["D"+str(self.lignedebut+day_value-1)].value))
-        print("la valeur entre les deux cartes bleues" + str((valeur_SC + valeur_AvC)))
+        print("la valeur entre les deux cartes bleues" + str(round((valeur_SC + valeur_AvC),2)))
         
-        if (str(self.tableau_de_compta_ws["D"+str(self.lignedebut+day_value-1)].value) != str((valeur_SC + valeur_AvC)) ):
-            raise ErreurExcel(self.case_iteration, "La veleur dans le relevé et dans l'excel de compta ne correspondent pas")
+        if (str(self.tableau_de_compta_ws["D"+str(self.lignedebut+day_value-1)].value) != str(round((valeur_SC + valeur_AvC),2))):
+            raise ErreurExcel(self.case_iteration, "La valeur dans le relevé et dans l'excel de compta ne correspondent pas")
         return True
     
     def getValeurCredit (self, current_cell):
@@ -175,7 +175,7 @@ class ReleveAuto:
             ##Si la case est une carte bleue
             if ("REMISE CARTE") in value_case_releve:
                 # print("find remise carte in line : "+ str(ligne_releve))
-                ## Si la carte est une AvC223293501
+                ## Si la carte est une AvC
                 if ("2232935") in value_case_releve:
                        ## print("find card Avc : "+ str(ligne_releve))
                     ## Rechercher la CB SC de la ^m journée
@@ -197,10 +197,13 @@ class ReleveAuto:
                         if complete_date != "no match" and month_value == self.numMois:
                             case_carte_sc = self.trouver_case_carte_meme_date(ligne_releve,complete_date)                         
                             if self.verif_CB(self.getValeurCredit(case_carte_sc),self.getValeurCredit(self.releve_de_compte_ws[self.case_iteration]),day_value) == True :
-                                self.cocher_releve_de_compte(str(ligne_releve+ self.lignedebut ))
+                                self.noter_releve_de_compte(str(ligne_releve ), "Vérifiée CB")
                 ## DABoi
-            elif ("2903075") in value_case_releve:
-                self.tableau_de_compta_ws["AI" + str(ligne_releve)].value = -(self.getValeurCredit(self.case_iteration).value)
+                elif ("2903075") in value_case_releve:
+                    if self.getValeurCredit(self.releve_de_compte_ws[self.case_iteration]) == True :
+                        self.noter_releve_de_compte(str(ligne_releve), "Vérifiée DAB")
+                    else : 
+                        self.noter_releve_de_compte(str(ligne_releve), "Non écrite DAB")
                 
         except ErreurExcel as e:  
                 self.tableau_erreur.append((e.current_cellCoord, e.details_error))        
