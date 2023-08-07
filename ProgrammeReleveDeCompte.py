@@ -68,7 +68,17 @@ class ReleveAuto:
     
     case_iteration = ""
     numMois = 0
+    ligneJour = None
+    day_value = None
     
+    def writeInExcelCompta(self,type,valeur):
+        
+        if (type == "DAB"):
+            print("str((self.lignedebut + self.day_value) :" + str((self.lignedebut-1 + self.day_value)))
+            case = "AI" + str((self.lignedebut-1 + self.day_value))
+            self.tableau_de_compta_ws[case] = valeur-valeur-valeur
+        
+        return
     
     def fill_fichier_error (self):
         for index, (valeur_1, valeur_2) in enumerate(self.tableau_erreur, start=2):
@@ -88,11 +98,11 @@ class ReleveAuto:
             :param valeur_AvC : valeur carte Avc Contact
             :return : Vrai si match
          """ 
-        print("valeur sc" +  str(valeur_SC))
-        print("valeur AvC" +  str(valeur_AvC))
-        print("jour : " + str(day_value))
-        print("valeur dans le tableau de compte à la case : " + "D"+str(self.lignedebut+day_value-1) + " = " + str(self.tableau_de_compta_ws["D"+str(self.lignedebut+day_value-1)].value))
-        print("la valeur entre les deux cartes bleues" + str(round((valeur_SC + valeur_AvC),2)))
+        # print("valeur sc" +  str(valeur_SC))
+        # print("valeur AvC" +  str(valeur_AvC))
+        # print("jour : " + str(day_value))
+        # print("valeur dans le tableau de compte à la case : " + "D"+str(self.lignedebut+day_value-1) + " = " + str(self.tableau_de_compta_ws["D"+str(self.lignedebut+day_value-1)].value))
+        # print("la valeur entre les deux cartes bleues" + str(round((valeur_SC + valeur_AvC),2)))
         
         if (str(self.tableau_de_compta_ws["D"+str(self.lignedebut+day_value-1)].value) != str(round((valeur_SC + valeur_AvC),2))):
             raise ErreurExcel(self.case_iteration, "La valeur dans le relevé et dans l'excel de compta ne correspondent pas")
@@ -175,36 +185,38 @@ class ReleveAuto:
             ##Si la case est une carte bleue
             if ("REMISE CARTE") in value_case_releve:
                 # print("find remise carte in line : "+ str(ligne_releve))
-                ## Si la carte est une AvC
-                if ("2232935") in value_case_releve:
-                       ## print("find card Avc : "+ str(ligne_releve))
-                    ## Rechercher la CB SC de la ^m journée
-                    ## Ajouter les deux cartes bleues ensemble
-                    ## check avec le tableur compta s'il y a match 
-                    ## Case cochée si oui, Erreur si non
-                    
-                    ## match group : format "DD/MM"
-                    
-                        complete_date = self.extract_match_date_from_string(value_case_releve)
+                complete_date = self.extract_match_date_from_string(value_case_releve)
 
-                        if complete_date:
-                            # Conversion de la chaîne de date en objet de date Python
-                            date_object = datetime.strptime(complete_date, '%d/%m')
-                            # Obtenir le jour en tant qu'entier
-                            day_value = date_object.day
-                            month_value = str(date_object.month)
-                            # print('est ce que la valeur month :'+  month_value + 'est egale à ' + self.numMois)
-                        if complete_date != "no match" and month_value == self.numMois:
-                            case_carte_sc = self.trouver_case_carte_meme_date(ligne_releve,complete_date)                         
-                            if self.verif_CB(self.getValeurCredit(case_carte_sc),self.getValeurCredit(self.releve_de_compte_ws[self.case_iteration]),day_value) == True :
-                                self.noter_releve_de_compte(str(ligne_releve ), "Vérifiée CB")
-                ## DABoi
-                elif ("2903075") in value_case_releve:
-                    if self.getValeurCredit(self.releve_de_compte_ws[self.case_iteration]) == True :
-                        self.noter_releve_de_compte(str(ligne_releve), "Vérifiée DAB")
-                    else : 
-                        self.noter_releve_de_compte(str(ligne_releve), "Non écrite DAB")
-                
+                if complete_date:
+                    # Conversion de la chaîne de date en objet de date Python
+                    date_object = datetime.strptime(complete_date, '%d/%m')
+                    # Obtenir le jour en tant qu'entier
+                    self.day_value = date_object.day
+                    month_value = str(date_object.month)                
+                if complete_date != "no match" and month_value == self.numMois:
+                    ## Si la carte est une AvC
+                    if ("2232935") in value_case_releve:
+                        
+                        ## Rechercher la CB SC de la ^m journée
+                        ## Ajouter les deux cartes bleues ensemble
+                        ## check avec le tableur compta s'il y a match 
+                        ## Case cochée si oui, Erreur si non
+                        ## match group : format "DD/MM"
+                        
+                            
+                                case_carte_sc = self.trouver_case_carte_meme_date(ligne_releve,complete_date)                         
+                                if self.verif_CB(self.getValeurCredit(case_carte_sc),self.getValeurCredit(self.releve_de_compte_ws[self.case_iteration]),self.day_value) == True :
+                                    self.noter_releve_de_compte(str(ligne_releve ), "Vérifiée CB")
+                    ## DABoi
+                    elif ("2903075") in value_case_releve:
+                        valeur = self.getValeurCredit(self.releve_de_compte_ws[self.case_iteration])
+                        if valeur != None :
+                            self.writeInExcelCompta("DAB",valeur)
+                            self.noter_releve_de_compte(str(ligne_releve), "Vérifiée DAB")
+                        else : 
+                            self.noter_releve_de_compte(str(ligne_releve), "Non écrite DAB")
+                            raise ErreurExcel(self.case_iteration, "La valeur du DAB n'a pas été écrite dans le tableur")
+                    
         except ErreurExcel as e:  
                 self.tableau_erreur.append((e.current_cellCoord, e.details_error))        
                 
