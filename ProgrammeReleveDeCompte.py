@@ -210,13 +210,13 @@ class ReleveAuto:
                             
                                 case_carte_sc = self.trouver_case_carte_meme_date(ligne_releve,complete_date)                         
                                 if self.verif_CB(self.getValeurCredit(case_carte_sc),self.getValeurCredit(self.releve_de_compte_ws[self.case_iteration]),self.day_value) == True :
-                                    self.noter_releve_de_compte(str(ligne_releve ), "Vérifiée CB")
+                                    self.noter_releve_de_compte(str(ligne_releve ), 'X')
                     ## DABoi
                     elif ("2903075") in value_case_releve:
                         valeur = self.getValeurCredit(self.releve_de_compte_ws[self.case_iteration])
                         if valeur != None :
                             self.writeInExcelCompta("DAB",valeur)
-                            self.noter_releve_de_compte(str(ligne_releve), "Vérifiée DAB")
+                            self.noter_releve_de_compte(str(ligne_releve), 'X')
                         else : 
                             self.noter_releve_de_compte(str(ligne_releve), "Non écrite DAB")
                             raise ErreurExcel(self.case_iteration, "La valeur du DAB n'a pas été écrite dans le tableur")
@@ -225,6 +225,23 @@ class ReleveAuto:
                 self.tableau_erreur.append((e.current_cellCoord, e.details_error))        
                 
                 return
+            
+            
+            
+    def writeInExcelCompta(self,type,valeur):
+    
+        if (type == "DAB"):
+            print("str((self.lignedebut + self.day_value) :" + str((self.lignedebut-1 + self.day_value)))
+            
+            case = "AI" + str((self.lignedebut-1 + self.day_value))
+            print("value :")
+            print(self.tableau_de_compta_ws[case].value)
+            if(self.tableau_de_compta_ws[case].value == None):
+                self.tableau_de_compta_ws[case] = 0-valeur
+            else:
+                self.tableau_de_compta_ws[case] = self.tableau_de_compta_ws[case].value -valeur
+        
+        return        
 
     def Execution(
         self
