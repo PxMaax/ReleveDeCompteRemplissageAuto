@@ -53,6 +53,10 @@ class ReleveAuto:
     colone_depart_releve = "B"
     ligne_releve = 11
     
+    variableVide = True
+    
+    
+    
     tableau_de_compta_wb = None
     releve_de_compte_wb  = None
     
@@ -71,6 +75,14 @@ class ReleveAuto:
     ligneJour = None
     day_value = None
     
+    def writeInExcelCompta(self,type,valeur):
+        
+        if (type == "DAB"):
+            print("str((self.lignedebut + self.day_value) :" + self.tableau_de_compta_ws[case].value)
+            case = "AI" + str((self.lignedebut-1 + self.day_value))
+            self.tableau_de_compta_ws[case] =self.tableau_de_compta_ws[case].value - valeur
+        
+        return
     
     def fill_fichier_error (self):
         for index, (valeur_1, valeur_2) in enumerate(self.tableau_erreur, start=2):
@@ -100,7 +112,7 @@ class ReleveAuto:
             raise ErreurExcel(self.case_iteration, "La valeur dans le relevé et dans l'excel de compta ne correspondent pas")
         return True
     
-    def getValeurCredit (self, current_cell):
+    def getValeurCredit (self, current_cell): 
         
         """
             getValeurCredit : Function trouve la valeur de crédit
