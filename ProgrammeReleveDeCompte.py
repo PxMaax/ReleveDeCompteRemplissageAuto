@@ -30,7 +30,7 @@ weightBody= "bold"
 
 # Obtenir la date d'aujourd'hui
 aujourd_hui = date.today()
-
+ 
 # Convertir la date en chaîne de caractères
 date_str = aujourd_hui.strftime("%d/%m/%Y")  # Format: jour/mois/année
 
